@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>DES Encryption Tool</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f2f2f2;
+    padding:40px;
+}
+
+.container{
+    background:white;
+    padding:30px;
+    width:900px;
+    margin:auto;
+    border-radius:10px;
+}
+
+textarea{
+    width:100%;
+    height:120px;
+    margin-top:5px;
+}
+
+input{
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+}
+
+button{
+    margin-top:15px;
+    padding:10px 20px;
+    background:black;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+.option{
+    margin-top:10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>DES Encryption Tool</h2>
+
+<label>Text</label>
+<textarea id="text"></textarea>
+
+<label>Secret Key</label>
+<input type="text" id="key">
+
+<div class="option">
+Encryption Mode :
+<label><input type="radio" name="mode" value="CBC" checked> CBC</label>
+<label><input type="radio" name="mode" value="ECB"> ECB</label>
+</div>
+
+<label>IV (optional)</label>
+<input type="text" id="iv">
+
+<div class="option">
+Output Format :
+<label><input type="radio" name="format" value="base64" checked> Base64</label>
+<label><input type="radio" name="format" value="hex"> HEX</label>
+</div>
+
+<button onclick="encrypt()">Encrypt</button>
+<button onclick="decrypt()">Decrypt</button>
+
+<h3>Result</h3>
+<textarea id="result"></textarea>
+
+</div>
+
+<script>
+
+function encrypt(){
+
+let text = document.getElementById("text").value
+let key = document.getElementById("key").value
+let iv = document.getElementById("iv").value
+
+let mode = document.querySelector('input[name="mode"]:checked').value
+let format = document.querySelector('input[name="format"]:checked').value
+
+let keyUtf = CryptoJS.enc.Utf8.parse(key)
+
+let options = {}
+
+if(mode === "CBC"){
+options.mode = CryptoJS.mode.CBC
+options.iv = CryptoJS.enc.Utf8.parse(iv || "12345678")
+}else{
+options.mode = CryptoJS.mode.ECB
+}
+
+options.padding = CryptoJS.pad.Pkcs7
+
+let encrypted = CryptoJS.DES.encrypt(text, keyUtf, options)
+
+let output = (format === "hex") ? encrypted.ciphertext.toString() : encrypted.toString()
+
+document.getElementById("result").value = output
+
+}
+
+function decrypt(){
+
+let text = document.getElementById("text").value
+let key = document.getElementById("key").value
+let iv = document.getElementById("iv").value
+
+let mode = document.querySelector('input[name="mode"]:checked').value
+
+let keyUtf = CryptoJS.enc.Utf8.parse(key)
+
+let options = {}
+
+if(mode === "CBC"){
+options.mode = CryptoJS.mode.CBC
+options.iv = CryptoJS.enc.Utf8.parse(iv || "12345678")
+}else{
+options.mode = CryptoJS.mode.ECB
+}
+
+options.padding = CryptoJS.pad.Pkcs7
+
+let decrypted = CryptoJS.DES.decrypt(text, keyUtf, options)
+
+document.getElementById("result").value = decrypted.toString(CryptoJS.enc.Utf8)
+
+}
+
+</script>
+
+</body>
+</html>
